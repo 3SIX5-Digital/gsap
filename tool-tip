@@ -1,0 +1,27 @@
+<script>
+gsap.utils.toArray(".wf-element").forEach(el => {
+  let tooltip = el.getAttribute("data-tooltip");
+
+  ScrollTrigger.create({
+    trigger: el,
+    start: "top 80%",
+    onEnter: () => showTooltip(el, tooltip),
+    onLeaveBack: () => hideTooltip()
+  });
+
+  el.addEventListener("mouseenter", () => showTooltip(el, tooltip));
+  el.addEventListener("mouseleave", hideTooltip);
+});
+
+function showTooltip(el, text) {
+  const tooltip = document.querySelector(".tooltip");
+  tooltip.innerText = text;
+  tooltip.style.display = "block";
+  gsap.to(tooltip, { opacity: 1, x: el.offsetLeft + 40, y: el.offsetTop });
+}
+function hideTooltip() {
+  gsap.to(".tooltip", { opacity: 0, onComplete: () => {
+    document.querySelector(".tooltip").style.display = "none";
+  }});
+}
+</script>
