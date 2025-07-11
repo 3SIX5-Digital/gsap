@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAP Spinning Wheel</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .spinning-wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #ddd;
+            position: relative;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1); /* GSAP will override this */
+            border: 5px solid #333;
+        }
+
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background-color: var(--bg-color, #fff);
+            transform-origin: 100% 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            padding-left: 20px;
+            box-sizing: border-box;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -25px; /* Position above the wheel */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #e74c3c; /* Red pointer */
+            z-index: 10;
+        }
+
+        .content-slides-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .content-slides-container.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .slide {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+            max-height: 90vh; /* Max height to prevent overflow */
+            overflow-y: auto; /* Allow scrolling for tall content */
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .content-slides-container.active .slide {
+            transform: scale(1);
+        }
+
+        .slide img {
+            max-width: 100%;
+            height: auto;
+            max-height: 40vh; /* Limit image height */
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .slide h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .slide p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .slide .action-button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .slide .action-button:hover {
+            background-color: #2980b9;
+        }
+
+        .spin-again-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .spin-again-button:hover {
+            background-color: #27ae60;
+        }
+
+        .close-slide-button { /* For closing the slide without spinning again */
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: #fff; /* White color for visibility on dark overlay */
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 600px) {
+            .spinning-wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+            .pointer {
+                top: -20px;
+                border-left-width: 15px;
+                border-right-width: 15px;
+                border-top-width: 25px;
+            }
+            .segment {
+                font-size: 12px;
+            }
+            .slide {
+                padding: 20px;
+            }
+            .slide h2 {
+                font-size: 1.5em;
+            }
+            .slide p {
+                font-size: 1em;
+            }
+            .slide .action-button {
+                padding: 10px 20px;
+            }
+            .spin-again-button {
+                padding: 12px 25px;
+                font-size: 1em;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="spinning-wheel-container" id="wheelContainer">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel">
+            <!-- Segments will be added here by JavaScript -->
+        </div>
+    </div>
+
+    <button class="spin-again-button" id="spinAgainButton" style="display: none;">Spin Again!</button>
+
+    <div class="content-slides-container" id="contentSlidesContainer">
+        <button class="close-slide-button" id="closeSlideButton">&times;</button>
+        <div class="slide" id="currentSlideContent">
+            <!-- Content will be loaded here -->
+            <img src="" alt="Creative Idea" id="slideImage">
+            <h2 id="slideTitle"></h2>
+            <p id="slideDescription"></p>
+            <a href="#" class="action-button" id="slideActionLink" target="_blank">Learn More</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wheel = document.getElementById('wheel');
+            const wheelContainer = document.getElementById('wheelContainer');
+            const spinAgainButton = document.getElementById('spinAgainButton');
+            const contentSlidesContainer = document.getElementById('contentSlidesContainer');
+            const closeSlideButton = document.getElementById('closeSlideButton');
+
+            const slideImage = document.getElementById('slideImage');
+            const slideTitle = document.getElementById('slideTitle');
+            const slideDescription = document.getElementById('slideDescription');
+            const slideActionLink = document.getElementById('slideActionLink');
+
+            // Define your creative content here
+            const creativeContent = [
+                {
+                    title: "Abstract Painting",
+                    description: "Explore the world of colors and shapes. Let your emotions guide your brush.",
+                    image: "https://picsum.photos/seed/paint/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#FFC3A0" // Light Salmon
+                },
+                {
+                    title: "Creative Writing",
+                    description: "Pen down your thoughts, stories, or poems. Unleash the writer within you.",
+                    image: "https://picsum.photos/seed/write/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#A0C4FF" // Light Blue
+                },
+                {
+                    title: "Digital Art",
+                    description: "Use technology to create stunning visuals. The digital canvas is limitless.",
+                    image: "https://picsum.photos/seed/digital/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#9BF6B0" // Light Green
+                },
+                {
+                    title: "Photography",
+                    description: "Capture moments and perspectives. See the world through a different lens.",
+                    image: "https://picsum.photos/seed/photo/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#F6EAC2" // Light Yellow
+                },
+                {
+                    title: "Sculpting",
+                    description: "Shape materials into three-dimensional art. Bring your visions to life.",
+                    image: "https://picsum.photos/seed/sculpt/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#F6C2E8" // Light Pink
+                },
+                {
+                    title: "Music Composition",
+                    description: "Create melodies and harmonies. Express yourself through sound.",
+                    image: "https://picsum.photos/seed/music/600/400", // Placeholder image
+                    link: "#",
+                    bgColor: "#C2D1F6" // Light Periwinkle
+                },
+                {
+                    title: "Origami",
+                    description: "The art of paper folding. Create intricate designs from a simple sheet.",
+                    image: "https://picsum.photos/seed/origami/600/400",
+                    link: "#",
+                    bgColor: "#D4A5A5" // Rose Gold
+                },
+                {
+                    title: "Gardening Design",
+                    description: "Cultivate beauty by designing your own green space. Connect with nature.",
+                    image: "https://picsum.photos/seed/garden/600/400",
+                    link: "#",
+                    bgColor: "#A8D8B9" // Pale Green
+                }
+            ];
+
+            const numSegments = creativeContent.length;
+            const segmentAngle = 360 / numSegments;
+            let isSpinning = false;
+            let currentRotation = 0; // Keep track of the wheel's rotation
+
+            // Create wheel segments
+            creativeContent.forEach((content, index) => {
+                const segment = document.createElement('div');
+                segment.classList.add('segment');
+                // segment.textContent = content.title.split(' ')[0]; // REMOVED TEXT
+                segment.style.setProperty('--bg-color', content.bgColor);
+                // Calculate rotation for each segment.
+                // Each segment is a 90-degree triangle (clip-path). We rotate it into place.
+                // The transform-origin is bottom-right (100% 100%).
+                const rotation = segmentAngle * index;
+                segment.style.transform = `rotate(${rotation}deg) skewY(${90 - segmentAngle}deg)`;
+
+                // Adjust text orientation if needed, this can be tricky with skew
+                // const textSpan = document.createElement('span'); // REMOVED TEXT
+                // textSpan.textContent = content.title.split(' ')[0]; // REMOVED TEXT
+                // textSpan.style.display = 'inline-block'; // REMOVED TEXT
+                // Counter-rotate and un-skew the text if necessary. This is a basic attempt.
+                // For perfect text, SVG might be better or simpler segment shapes.
+                // textSpan.style.transform = `skewY(-${90 - segmentAngle}deg) rotate(-${segmentAngle / 2}deg)`; // REMOVED TEXT
+                // segment.innerHTML = ''; // Clear existing text // REMOVED TEXT
+                // segment.appendChild(textSpan); // REMOVED TEXT
+
+
+                wheel.appendChild(segment);
+            });
+
+
+            function spinWheel() {
+                if (isSpinning) return;
+                isSpinning = true;
+                spinAgainButton.style.display = 'none'; // Hide button during spin
+
+                // Calculate a random spin
+                const randomExtraSpins = Math.floor(Math.random() * 3) + 3; // 3 to 5 full spins for the visual effect
+                const randomSegmentIndex = Math.floor(Math.random() * numSegments);
+
+                // Calculate the angle to the middle of the target segment
+                // The pointer is at the top (0 degrees). We want the middle of the segment to land there.
+                // Segment `i` spans from `i * segmentAngle` to `(i+1) * segmentAngle`.
+                // Its middle is `(i * segmentAngle) + (segmentAngle / 2)`.
+                // To bring this middle to the top (0 degrees), we need to rotate by this amount.
+                // GSAP's rotation is relative. If currentRotation is -30, and we want to go to -90,
+                // we tell GSAP rotation: "-=60" or rotation: -90.
+                // We want a positive rotation value for our calculation ease, then make it negative for GSAP if needed.
+
+                const angleToSelectedSegmentCenter = (randomSegmentIndex * segmentAngle) + (segmentAngle / 2);
+
+                // Total rotation: current rotation + full spins + angle to target segment center
+                // GSAP handles relative rotations well with `"+="` or `"-="`.
+                // We want to spin clockwise, so GSAP rotation values will be negative.
+                // Let's calculate the total degrees to spin from the *current* position.
+                // The `currentRotation` is the actual rotation value GSAP is at (e.g. -750deg)
+
+                // The target angle on the wheel (0-360) that should be at the top pointer.
+                // This is the negative of the segment's center, because if segment center is at 90deg,
+                // wheel needs to rotate -90deg to bring it to top.
+                const targetAngle = -angleToSelectedSegmentCenter;
+
+                // Add full spins. GSAP's rotation is cumulative.
+                // We want to ensure it spins forward (more negative).
+                // If currentRotation = -750 (which is -30 mod 360)
+                // And targetAngle = -90 (to bring segment center at 90 to top)
+                // We want final rotation to be like: currentRotation - (some_full_spins) - (angle_to_make_target_face_up)
+                // Let's simplify: determine a final absolute rotation value.
+                // The final visual position should have the target segment at the top.
+                // This means the wheel's rotation `R` should satisfy `(R + angleToSelectedSegmentCenter) % 360 = 0` (or very close).
+                // So, `R % 360 = -angleToSelectedSegmentCenter % 360`.
+                // Let `finalAngleMod360 = (-angleToSelectedSegmentCenter % 360 + 360) % 360`.
+                // We want `gsap.getProperty(wheel, "rotation")` to end up being `X` such that `(X % 360 + 360) % 360 = finalAngleMod360`.
+                // But GSAP uses negative for clockwise. So if `finalAngleMod360` is 270 (i.e. -90), we're good.
+                // If `finalAngleMod360` is 90, we want GSAP's final rotation to be -90, or -450, or -810 etc.
+
+                // Simpler:
+                // 1. Current rotation (e.g. -750)
+                // 2. Add multiple full spins (e.g., - (3 * 360) = -1080)
+                // 3. Add rotation to point to the specific segment.
+                // The `randomSegmentIndex` is the one we want under the pointer.
+                // The pointer is at 0 degrees. The 0th segment starts at 0.
+                // To get the middle of segment `randomSegmentIndex` to the top, the wheel must rotate
+                // such that its original angle `(randomSegmentIndex * segmentAngle + segmentAngle / 2)` becomes 0.
+                // So, the rotation amount is `-(randomSegmentIndex * segmentAngle + segmentAngle / 2)`.
+                // This is the final position modulo 360.
+
+                let desiredFinalAngle = -((randomSegmentIndex * segmentAngle) + (segmentAngle / 2));
+
+                // Ensure it spins forward by adding enough full rotations.
+                // currentRotation is already negative (or 0).
+                // finalRotation should be more negative than currentRotation.
+                let finalRotation = currentRotation;
+                finalRotation -= (randomExtraSpins * 360); // Add full spins
+
+                // Now adjust to make sure the desired segment is at the top.
+                // We want finalRotation % 360 to be equivalent to desiredFinalAngle % 360.
+                // (finalRotation % 360 + 360) % 360 should be (desiredFinalAngle % 360 + 360) % 360
+
+                // Let's set the final rotation based on desiredFinalAngle and ensure it's always moving forward
+                // from the currentRotation by adding necessary full spins.
+                // Start with the base target (e.g. -90 for segment center at 90 deg)
+                // Add enough negative full rotations so it's less than currentRotation.
+                finalRotation = desiredFinalAngle;
+                while (finalRotation >= currentRotation) {
+                    finalRotation -= 360;
+                }
+                // Add a few more random spins to make it visually appealing
+                finalRotation -= (randomExtraSpins * 360);
+
+
+                gsap.to(wheel, {
+                    rotation: finalRotation, // GSAP handles this as the absolute target rotation
+                    duration: 5, // Spin duration
+                    ease: "power3.out", // Smoother easing
+                    onComplete: () => {
+                        isSpinning = false;
+                        currentRotation = finalRotation; // Update current rotation to the new absolute value
+
+                        // The winning index is simply randomSegmentIndex, as we targeted it.
+                        displayContent(creativeContent[randomSegmentIndex]);
+                    }
+                });
+            }
+
+            function displayContent(content) {
+                slideImage.src = content.image;
+                slideImage.alt = content.title;
+                slideTitle.textContent = content.title;
+                slideDescription.textContent = content.description;
+                slideActionLink.href = content.link;
+
+                contentSlidesContainer.classList.add('active');
+                spinAgainButton.style.display = 'block'; // Show spin again button
+            }
+
+            function hideContent() {
+                contentSlidesContainer.classList.remove('active');
+            }
+
+            wheelContainer.addEventListener('click', spinWheel);
+            spinAgainButton.addEventListener('click', () => {
+                hideContent();
+                // Optional: slight delay before auto-spin or just allow manual spin
+                // setTimeout(spinWheel, 500); // Example: auto-spin after 0.5s
+            });
+            closeSlideButton.addEventListener('click', () => {
+                hideContent();
+                spinAgainButton.style.display = 'block'; // Ensure spin again is visible
+            });
+
+            // Initial call to setup or a welcome message if needed
+            // For example, you could have an initial state or a "Click to Spin" prompt.
+        });
+    </script>
+</body>
+</html>
