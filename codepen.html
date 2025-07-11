@@ -401,23 +401,53 @@
 
                 // Let's set the final rotation based on desiredFinalAngle and ensure it's always moving forward
                 // from the currentRotation by adding necessary full spins.
-                // Start with the base target (e.g. -90 for segment center at 90 deg)
-                // Add enough negative full rotations so it's less than currentRotation.
-                finalRotation = desiredFinalAngle;
-                while (finalRotation >= currentRotation) {
-                    finalRotation -= 360;
-                }
-                // Add a few more random spins to make it visually appealing
-                finalRotation -= (randomExtraSpins * 360);
+                // Let GSAP handle the incremental rotation.
+                // We calculate the shortest angle to the target, then add full spins.
+                // currentRotation is the current absolute rotation of the wheel (e.g., -750deg)
+                // desiredFinalAngle is the target resting position for this spin (e.g., -90deg if segment center is 90deg)
 
+                // Calculate the difference to the desiredFinalAngle from the current angle (mod 360)
+                const currentAngleMod360 = (currentRotation % 360 + 360) % 360;
+                const desiredAngleMod360 = (desiredFinalAngle % 360 + 360) % 360;
+
+                let rotationChange = desiredAngleMod360 - currentAngleMod360;
+
+                // This rotationChange is the shortest path. Add full spins.
+                // We want to spin clockwise (negative direction for GSAP).
+                // So, if rotationChange is positive (e.g. current is -30 (330), target is -90 (270), change is 270-330 = -60)
+                // If rotationChange is negative (e.g. current is -90 (270), target is -30 (330), change is 330-270 = 60)
+                // We always want to add negative (clockwise) spins.
+
+                let spinDelta = -((randomExtraSpins * 360) + rotationChange);
+
+                // Ensure the spinDelta always makes it spin forward significantly if rotationChange was small or positive
+                // This logic needs to be robust. Let's use GSAP's relative rotation "+=" or "-=" with a large value.
+
+                // Target rotation:
+                // 1. Get the wheel to the desiredFinalAngle (e.g., -90deg, -450deg, -810deg etc.)
+                // 2. Ensure it's always a forward (more negative) spin from currentRotation.
+                // 3. Add randomExtraSpins.
+
+                let targetRot = desiredFinalAngle; // e.g. -90 (segment is at 90 deg)
+
+                // Ensure targetRot is less than currentRotation to guarantee a forward spin
+                while (targetRot >= currentRotation) {
+                    targetRot -= 360;
+                }
+
+                // Add the random extra spins (making it even more negative/clockwise)
+                targetRot -= (randomExtraSpins * 360);
+
+                // Now, currentRotation will be updated to this new targetRot.
+                // This ensures that the next spin will again start from this new large negative value.
 
                 gsap.to(wheel, {
-                    rotation: finalRotation, // GSAP handles this as the absolute target rotation
+                    rotation: targetRot, // Target absolute rotation
                     duration: 5, // Spin duration
                     ease: "power3.out", // Smoother easing
                     onComplete: () => {
                         isSpinning = false;
-                        currentRotation = finalRotation; // Update current rotation to the new absolute value
+                        currentRotation = targetRot; // Update current rotation to the new absolute value
 
                         // The winning index is simply randomSegmentIndex, as we targeted it.
                         displayContent(creativeContent[randomSegmentIndex]);
@@ -443,12 +473,15 @@
             wheelContainer.addEventListener('click', spinWheel);
             spinAgainButton.addEventListener('click', () => {
                 hideContent();
-                // Optional: slight delay before auto-spin or just allow manual spin
-                // setTimeout(spinWheel, 500); // Example: auto-spin after 0.5s
+                // isSpinning should be false here, but let's ensure it.
+                // isSpinning = false; // This is handled by the spinWheel onComplete
+                // The wheelContainer click listener will handle the next spin.
+                // We just need to make sure the button is hidden again if a new spin starts.
+                // spinAgainButton.style.display = 'none'; // This will be handled by spinWheel
             });
             closeSlideButton.addEventListener('click', () => {
                 hideContent();
-                spinAgainButton.style.display = 'block'; // Ensure spin again is visible
+                spinAgainButton.style.display = 'block'; // Ensure spin again is visible if user closes without spinning
             });
 
             // Initial call to setup or a welcome message if needed
