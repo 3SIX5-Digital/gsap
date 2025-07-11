@@ -106,7 +106,7 @@ body {
   /* opacity: 0; Already handled by display none/block based on active state */
   /* transform: translateX(20px); */ /* Entry animation for active content */
   transition: opacity 0.4s ease-in-out 0.15s, transform 0.4s ease-in-out 0.15s;
-  width: 500px;
+  width: 800px; /* Increased width for active slide */
   max-width: 100%;
   display: block; /* Should be block by default for active slide */
 }
@@ -175,6 +175,20 @@ body {
 }
 .slider-nav:hover {
   background-color: #333;
+}
+
+/* --- Tablet Adjustments --- */
+@media (max-width: 992px) and (min-width: 768px) { /* Target tablets specifically */
+  .active-view {
+    width: 600px; /* Intermediate width for tablets */
+  }
+  .slide-item { /* Adjust thumbnail width if needed for this range */
+    width: 180px;
+    margin-right: 15px;
+  }
+  .active-title { /* Slightly smaller title if needed */
+    font-size: 2em;
+  }
 }
 
 
