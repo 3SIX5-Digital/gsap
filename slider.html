@@ -1,27 +1,118 @@
-<!-- Slider container -->
-<div class="slider-container">
-  <!-- Slides wrapper -->
-  <div class="slides-wrapper">
-    <!-- Individual slides -->
-    <div class="slide">
-      <!-- Content for slide 1 -->
-      <img src="https://via.placeholder.com/800x400?text=Slide+1" alt="Slide 1">
-      <div class="slide-caption">Caption for Slide 1</div>
+<div class="advanced-slider-container">
+  <div class="slider-viewport">
+    <div class="slider-track">
+      <!-- Slide 1 -->
+      <div class="slide-item" data-slide-index="0">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+1" alt="Thumbnail 1" class="thumb-image">
+            <h3 class="thumb-title">Product Alpha</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Alpha" alt="Active Image 1" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Alpha Detailed</h2>
+              <p class="active-description">Alpha product description - outstanding quality and design.</p>
+              <button class="active-button">Explore Alpha</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="slide-item" data-slide-index="1">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+2" alt="Thumbnail 2" class="thumb-image">
+            <h3 class="thumb-title">Product Beta</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Beta" alt="Active Image 2" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Beta In Focus</h2>
+              <p class="active-description">Beta product: innovative features for a modern lifestyle.</p>
+              <button class="active-button">See Beta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="slide-item" data-slide-index="2">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+3" alt="Thumbnail 3" class="thumb-image">
+            <h3 class="thumb-title">Product Gamma</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Gamma" alt="Active Image 3" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Gamma: Unveiled</h2>
+              <p class="active-description">Gamma product: the ultimate choice for professionals.</p>
+              <button class="active-button">Learn Gamma</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="slide-item" data-slide-index="3">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+4" alt="Thumbnail 4" class="thumb-image">
+            <h3 class="thumb-title">Product Delta</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Delta" alt="Active Image 4" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Delta: Special</h2>
+              <p class="active-description">Delta product: exclusive features and premium build.</p>
+              <button class="active-button">Discover Delta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5 -->
+      <div class="slide-item" data-slide-index="4">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+5" alt="Thumbnail 5" class="thumb-image">
+            <h3 class="thumb-title">Product Epsilon</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Epsilon" alt="Active Image 5" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Epsilon: Newest</h2>
+              <p class="active-description">Epsilon product: cutting-edge technology for you.</p>
+              <button class="active-button">View Epsilon</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6 - Initially Active Example -->
+      <div class="slide-item active" data-slide-index="5">
+        <div class="slide-content-wrapper">
+          <div class="thumb-view">
+            <img src="https://via.placeholder.com/200x150?text=Thumb+6" alt="Thumbnail 6" class="thumb-image">
+            <h3 class="thumb-title">Product Zeta</h3>
+          </div>
+          <div class="active-view">
+            <img src="https://via.placeholder.com/500x350?text=Active+Zeta" alt="Active Image 6" class="active-image">
+            <div class="active-details">
+              <h2 class="active-title">Product Zeta: Premium</h2>
+              <p class="active-description">Zeta product: luxury and performance combined.</p>
+              <button class="active-button">Explore Zeta</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="slide">
-      <!-- Content for slide 2 -->
-      <img src="https://via.placeholder.com/800x400?text=Slide+2" alt="Slide 2">
-      <div class="slide-caption">Caption for Slide 2</div>
-    </div>
-    <div class="slide">
-      <!-- Content for slide 3 -->
-      <img src="https://via.placeholder.com/800x400?text=Slide+3" alt="Slide 3">
-      <div class="slide-caption">Caption for Slide 3</div>
-    </div>
-    <!-- Add more slides as needed -->
   </div>
 
-  <!-- Navigation buttons -->
-  <button class="prev-btn">&lt;</button>
-  <button class="next-btn">&gt;</button>
+  <div class="slider-navigation-wrapper">
+    <button class="slider-nav prev">&lt; Prev</button>
+    <button class="slider-nav next">Next &gt;</button>
+  </div>
 </div>
