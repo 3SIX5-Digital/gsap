@@ -18,250 +18,259 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const NUM_VISIBLE_THUMBNAILS = 3;
-  let currentIndex = slides.findIndex(slide => slide.classList.contains('active'));
-  if (currentIndex < 0 || currentIndex >= slides.length) {
-    currentIndex = Math.max(0, slides.length - 1); // Default to last original slide
+  let initialActiveIndex = slides.findIndex(slide => slide.classList.contains('active'));
+  if (initialActiveIndex < 0 || initialActiveIndex >= slides.length) {
+    initialActiveIndex = Math.max(0, slides.length - 1);
   }
 
+  let currentIndex = initialActiveIndex; // This will be updated after cloning for desktop
   let isTransitioning = false;
-  const fixedActiveViewWidth = 500; // From CSS, or measure activeSlide.querySelector('.active-view').offsetWidth
+  const fixedActiveViewWidth = 500;
   let isMobileView = window.innerWidth <= 767;
 
-  // --- Infinite Loop Setup: Cloning Slides (Only for Desktop) ---
-  let originalSlidesCount = slides.length; // Count before cloning
+  let originalSlidesCount = slides.length;
   const clonesToPrepend = [];
   const clonesToAppend = [];
 
   function setupDesktopClones() {
-    if (slides.length > originalSlidesCount) return; // Clones already set up
+    if (slides.some(s => s.classList.contains('cloned'))) return;
+
+    const originalSlidesSnapshot = Array.from(track.querySelectorAll('.slide-item:not(.cloned)'));
+    originalSlidesCount = originalSlidesSnapshot.length;
+    if (originalSlidesCount === 0) return;
+
+    clonesToPrepend.length = 0;
+    clonesToAppend.length = 0;
 
     for (let i = 0; i < NUM_VISIBLE_THUMBNAILS + 1; i++) {
-      const slideIndex = (originalSlidesCount - 1 - i + originalSlidesCount) % originalSlidesCount;
-      const originalSlideToClone = slides.find(s => parseInt(s.dataset.slideIndex) === slideIndex && !s.classList.contains('cloned')); // Find original
-      if(originalSlideToClone){
-        const clone = originalSlideToClone.cloneNode(true);
+      const slideIndexToClone = (originalSlidesCount - 1 - i + originalSlidesCount) % originalSlidesCount;
+      const originalSlideNode = originalSlidesSnapshot[slideIndexToClone];
+      if(originalSlideNode) {
+        const clone = originalSlideNode.cloneNode(true);
         clone.classList.add('cloned', 'cloned-prepended');
         clone.classList.remove('active');
-        clone.dataset.originalIndex = originalSlideToClone.dataset.slideIndex;
+        clone.dataset.originalIndex = originalSlideNode.dataset.slideIndex;
         track.insertBefore(clone, track.firstChild);
         clonesToPrepend.push(clone);
       }
     }
 
-    for (let i = 0; i < NUM_VISIBLE_THUMBNAILS + 1 + 1; i++) {
-      const originalSlideToClone = slides.find(s => parseInt(s.dataset.slideIndex) === (i % originalSlidesCount) && !s.classList.contains('cloned')); // Find original
-       if(originalSlideToClone){
-        const clone = originalSlideToClone.cloneNode(true);
+    for (let i = 0; i < NUM_VISIBLE_THUMBNAILS + 1 + 1; i++) { // +1 for active, +1 for buffer
+      const slideIndexToClone = i % originalSlidesCount;
+      const originalSlideNode = originalSlidesSnapshot[slideIndexToClone];
+      if(originalSlideNode){
+        const clone = originalSlideNode.cloneNode(true);
         clone.classList.add('cloned', 'cloned-appended');
         clone.classList.remove('active');
-        clone.dataset.originalIndex = originalSlideToClone.dataset.slideIndex;
+        clone.dataset.originalIndex = originalSlideNode.dataset.slideIndex;
         track.appendChild(clone);
         clonesToAppend.push(clone);
-       }
+      }
     }
-    // Update slides array to include clones
     slides = Array.from(track.querySelectorAll('.slide-item'));
   }
 
   function removeDesktopClones() {
-      slides.filter(s => s.classList.contains('cloned')).forEach(clone => clone.remove());
-      slides = Array.from(track.querySelectorAll('.slide-item:not(.cloned)')); // Revert to original slides
-      // Ensure originalSlidesCount is accurate if this function is ever called multiple times
-      originalSlidesCount = slides.length;
+    slides.filter(s => s.classList.contains('cloned')).forEach(clone => clone.remove());
+    slides = Array.from(track.querySelectorAll('.slide-item:not(.cloned)'));
+    originalSlidesCount = slides.length;
   }
-
 
   function initializeSliderState() {
     isMobileView = window.innerWidth <= 767;
+    removeDesktopClones();
 
-    // Clear existing clones if switching from desktop to mobile or vice-versa to avoid issues
-    slides.filter(s => s.classList.contains('cloned')).forEach(clone => clone.remove());
-    slides = Array.from(track.querySelectorAll('.slide-item:not(.cloned)')); // Reset to originals
-    originalSlidesCount = slides.length; // Recalculate original count
+    slides = Array.from(track.querySelectorAll('.slide-item')); // Should be originals only now
+    originalSlidesCount = slides.length;
+    if (originalSlidesCount === 0) return;
 
-    if (!isMobileView && originalSlidesCount > 0) { // Min slides for cloning to make sense
-      setupDesktopClones(); // Re-setup clones for desktop
-      // Adjust currentIndex to point to the first non-cloned instance of the active slide
-      const currentActiveOriginalIndex = parseInt(slides[currentIndex]?.dataset.originalIndex || slides[currentIndex]?.dataset.slideIndex || '0');
-      currentIndex = slides.findIndex(s => !s.classList.contains('cloned') && parseInt(s.dataset.slideIndex) === currentActiveOriginalIndex);
-      if (currentIndex === -1) currentIndex = clonesToPrepend.length; // Default to first original if not found
-    } else {
-      // For mobile, ensure currentIndex is within bounds of original slides
-      const currentActiveOriginalIndex = parseInt(slides[currentIndex]?.dataset.originalIndex || slides[currentIndex]?.dataset.slideIndex || '0');
-      currentIndex = slides.findIndex(s => parseInt(s.dataset.slideIndex) === currentActiveOriginalIndex);
-      if (currentIndex === -1) currentIndex = Math.max(0, originalSlidesCount - 1);
-
-      track.style.transform = 'none'; // Reset track transform for mobile
+    let logicalCurrentIndex = slides.findIndex(slide => slide.classList.contains('active'));
+    if (logicalCurrentIndex < 0 || logicalCurrentIndex >= originalSlidesCount) {
+        logicalCurrentIndex = initialActiveIndex; // Use the initially set active index
+        if (logicalCurrentIndex < 0 || logicalCurrentIndex >= originalSlidesCount) {
+             logicalCurrentIndex = Math.max(0, originalSlidesCount - 1);
+        }
     }
 
-    // Ensure only one slide is active
+    if (!isMobileView) {
+      setupDesktopClones();
+      currentIndex = slides.findIndex(s => !s.classList.contains('cloned') && parseInt(s.dataset.slideIndex) === logicalCurrentIndex);
+      if (currentIndex === -1 && slides.length > 0) {
+          currentIndex = clonesToPrepend.length + logicalCurrentIndex;
+          if(currentIndex >= slides.length || currentIndex < 0) currentIndex = clonesToPrepend.length; // further fallback
+      }
+    } else {
+      currentIndex = logicalCurrentIndex;
+      if(track) track.style.transform = 'none';
+    }
+
     slides.forEach((s, i) => s.classList.toggle('active', i === currentIndex));
 
     if (!isMobileView) {
       positionTrackForActiveSlide(true);
+    } else {
+      if(slides[currentIndex]) slides[currentIndex].scrollIntoView({ behavior: 'auto', block: 'nearest' });
     }
   }
-
 
   function updateSlider(newDirectionOrIndex, isInitialization = false) {
     if (isTransitioning && !isInitialization) return;
     if (!isMobileView) isTransitioning = true;
 
-    let newActiveIndex = currentIndex; // This will be the actual index in the 'slides' array
-    const currentLogicalIndex = parseInt(slides[currentIndex].dataset.originalIndex || slides[currentIndex].dataset.slideIndex);
+    let newActiveActualIndex = currentIndex;
+    const currentOriginalSlideIndex = parseInt(slides[currentIndex].dataset.originalIndex || slides[currentIndex].dataset.slideIndex);
+    const numOriginalSlides = track.querySelectorAll('.slide-item:not(.cloned)').length;
 
-    if (typeof newDirectionOrIndex === 'number') { // Direct jump to an original slide index
+
+    if (typeof newDirectionOrIndex === 'number') {
         const targetOriginalIndex = newDirectionOrIndex;
-        // On desktop, find the first non-cloned instance. On mobile, find the direct slide.
-        const targetSlide = slides.find(s =>
+        const targetSlideInstance = slides.find(s =>
             (isMobileView || !s.classList.contains('cloned')) &&
             parseInt(s.dataset.slideIndex) === targetOriginalIndex
         );
-        if (targetSlide) {
-            newActiveIndex = slides.indexOf(targetSlide);
-        } else if (!isMobileView) { // Fallback for desktop if non-cloned not found, try cloned
+        if (targetSlideInstance) {
+            newActiveActualIndex = slides.indexOf(targetSlideInstance);
+        } else if (!isMobileView) {
             const clonedTarget = slides.find(s => s.classList.contains('cloned') && parseInt(s.dataset.originalIndex) === targetOriginalIndex);
-            if(clonedTarget) newActiveIndex = slides.indexOf(clonedTarget);
+            if(clonedTarget) newActiveActualIndex = slides.indexOf(clonedTarget);
             else { if (!isMobileView) isTransitioning = false; return; }
         } else {
-             if (!isMobileView) isTransitioning = false; return; // No valid target on mobile
+             if (!isMobileView) isTransitioning = false; return;
         }
-    } else { // Direction based ('prev' or 'next')
+    } else {
         const direction = newDirectionOrIndex;
-        let newLogicalIdx = currentLogicalIndex;
-        if (direction === 'next') {
-            newLogicalIdx = (currentLogicalIndex + 1) % originalSlidesCount;
-        } else { // prev
-            newLogicalIdx = (currentLogicalIndex - 1 + originalSlidesCount) % originalSlidesCount;
-        }
-        // Find the corresponding actual slide (non-cloned for desktop reference, any for mobile)
-        const firstInstanceOfNewLogical = slides.find(s =>
-            (isMobileView || !s.classList.contains('cloned')) &&
-            parseInt(s.dataset.slideIndex) === newLogicalIdx
-        );
-        if(firstInstanceOfNewLogical){
-            newActiveIndex = slides.indexOf(firstInstanceOfNewLogical);
-             // For desktop prev/next, we actually want to move along the cloned track, so adjust if needed
-            if(!isMobileView && direction === 'next' && newActiveIndex < currentIndex) newActiveIndex += originalSlidesCount;
-            if(!isMobileView && direction === 'prev' && newActiveIndex > currentIndex) newActiveIndex -= originalSlidesCount;
-            // A simpler way for desktop prev/next on cloned track:
-            if(!isMobileView) newActiveIndex = currentIndex + (direction === 'next' ? 1 : -1);
-
-
-        } else { // Should ideally not happen
-             newActiveIndex = currentIndex + (direction === 'next' ? 1 : -1);
+        if (!isMobileView) {
+            newActiveActualIndex = currentIndex + (direction === 'next' ? 1 : -1);
+        } else {
+            let newLogicalIndex = (currentOriginalSlideIndex + (direction === 'next' ? 1 : -1) + numOriginalSlides) % numOriginalSlides;
+            newActiveActualIndex = slides.findIndex(s => parseInt(s.dataset.slideIndex) === newLogicalIndex && !s.classList.contains('cloned'));
         }
     }
 
-    // Boundary checks for newActiveIndex within the full 'slides' array (including clones on desktop)
-    if (newActiveIndex < 0 || newActiveIndex >= slides.length) {
-        // This case should be handled by checkAndReset or indicates an issue
-        console.warn("newActiveIndex out of bounds", newActiveIndex);
-        if (!isMobileView) isTransitioning = false;
-        return;
+    if (newActiveActualIndex < 0 || newActiveActualIndex >= slides.length) {
+        console.warn("newActiveActualIndex out of bounds", newActiveActualIndex, "current:", currentIndex);
+        // Attempt to recover for desktop if out of bounds during prev/next on clones
+        if(!isMobileView){
+            if(newActiveActualIndex < 0) newActiveActualIndex = slides.length -1;
+            else if (newActiveActualIndex >= slides.length) newActiveActualIndex = 0;
+        } else {
+            if (!isMobileView) isTransitioning = false;
+            return;
+        }
     }
 
     slides[currentIndex].classList.remove('active');
-    slides[newActiveIndex].classList.add('active');
-    currentIndex = newActiveIndex;
+    slides[newActiveActualIndex].classList.add('active');
+    currentIndex = newActiveActualIndex;
 
     if (!isMobileView) {
         positionTrackForActiveSlide(isInitialization);
         const trackTransitionDuration = parseFloat(window.getComputedStyle(track).transitionDuration) * 1000 || 600;
         setTimeout(() => {
-          checkAndResetToOriginalSlide();
-          isTransitioning = false;
+          checkAndResetToOriginalSlide(); // This will also set isTransitioning = false eventually
         }, trackTransitionDuration);
     } else {
-        // On mobile, no track positioning, browser handles scroll.
-        // We might want to scroll the new active item into view.
-        slides[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if(slides[currentIndex]) slides[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // isTransitioning is not used for mobile scrolling in this way
     }
   }
 
   function checkAndResetToOriginalSlide() {
-    if (isMobileView) return; // No cloning or track reset on mobile
+    if (isMobileView || !slides[currentIndex]) {
+        isTransitioning = false; // Ensure flag is reset
+        return;
+    }
 
-    const currentSlide = slides[currentIndex];
-    if (currentSlide.classList.contains('cloned')) {
-      const originalIndex = parseInt(currentSlide.dataset.originalIndex);
+    const currentSlideNode = slides[currentIndex];
+    if (currentSlideNode.classList.contains('cloned')) {
+      const originalIndexToFind = parseInt(currentSlideNode.dataset.originalIndex);
       const originalSlideInstance = slides.find(s =>
         !s.classList.contains('cloned') &&
-        parseInt(s.dataset.slideIndex) === originalIndex
+        parseInt(s.dataset.slideIndex) === originalIndexToFind
       );
+
       if (originalSlideInstance) {
-        currentIndex = slides.indexOf(originalSlideInstance);
-        slides.forEach(s => s.classList.remove('active')); // Ensure only one is active
-        slides[currentIndex].classList.add('active');
+        const newOriginalActualIndex = slides.indexOf(originalSlideInstance);
 
         track.style.transition = 'none';
-        positionTrackForActiveSlide(true);
-        track.offsetHeight; // Force repaint
+
+        // Critical: Update active class and currentIndex *before* repositioning
+        currentSlideNode.classList.remove('active'); // Deactivate clone
+        originalSlideInstance.classList.add('active'); // Activate original
+        currentIndex = newOriginalActualIndex;      // Update global currentIndex
+
+        positionTrackForActiveSlide(true); // Recalculate and snap based on the *original* slide
+
+        track.offsetHeight;
         track.style.transition = 'transform 0.6s ease-in-out';
+      } else {
+        console.warn("Original slide for reset not found:", originalIndexToFind);
       }
     }
+    isTransitioning = false; // Reset flag after check/reset or if not a clone
   }
 
   function positionTrackForActiveSlide(isImmediate = false) {
-    if (isMobileView) {
-      track.style.transform = 'none'; // Ensure no transform on mobile
+    if (isMobileView || !slides[currentIndex]) {
+      if(track) track.style.transform = 'none';
       return;
     }
-    const activeSlide = slides[currentIndex];
+    const activeSlide = slides[currentIndex]; // Now correctly points to the target slide (original or clone)
     if (!activeSlide) return;
 
     const viewportWidth = viewport.offsetWidth;
     const activeContentView = activeSlide.querySelector('.active-view');
     const activeContentEffectiveWidth = activeContentView ? parseFloat(window.getComputedStyle(activeContentView).width) : fixedActiveViewWidth;
 
-    const desiredActiveLeftEdge = Math.max(0, viewportWidth - activeContentEffectiveWidth - 20); // 20 for some right padding
+    const desiredActiveLeftEdgeInViewport = Math.max(0, viewportWidth - activeContentEffectiveWidth - 20);
     const actualActiveOffsetLeft = activeSlide.offsetLeft;
 
-    let targetTranslateX = desiredActiveLeftEdge - actualActiveOffsetLeft;
+    let targetTranslateX = desiredActiveLeftEdgeInViewport - actualActiveOffsetLeft;
     targetTranslateX = Math.min(0, targetTranslateX);
 
-    if (isImmediate) {
-        const currentTransition = track.style.transition;
+    if (isImmediate && track.style.transition !== 'none') { // Only override if not already 'none'
+        const currentTransitionSetting = track.style.transition;
         track.style.transition = 'none';
         track.style.transform = `translateX(${targetTranslateX}px)`;
         track.offsetHeight;
-        track.style.transition = currentTransition || 'transform 0.6s ease-in-out';
-    } else {
+        track.style.transition = currentTransitionSetting || 'transform 0.6s ease-in-out';
+    } else if (isImmediate && track.style.transition === 'none') { // If already 'none', just set transform
+        track.style.transform = `translateX(${targetTranslateX}px)`;
+    }
+    else { // Animated
         track.style.transform = `translateX(${targetTranslateX}px)`;
     }
   }
 
-  slides.forEach((slide) => { // Original non-cloned slides for click events
-    if(!slide.classList.contains('cloned')){
-        slide.addEventListener('click', () => {
-            const targetOriginalIndex = parseInt(slide.dataset.slideIndex);
-            const currentActiveOriginalIndex = parseInt(slides[currentIndex].dataset.originalIndex || slides[currentIndex].dataset.slideIndex);
-            if (targetOriginalIndex !== currentActiveOriginalIndex) {
-                updateSlider(targetOriginalIndex);
-            }
-        });
-    }
+  track.addEventListener('click', function(event){
+      const clickedSlide = event.target.closest('.slide-item');
+      if(clickedSlide && slides.includes(clickedSlide)){
+          const targetOriginalIndex = parseInt(clickedSlide.dataset.originalIndex || clickedSlide.dataset.slideIndex);
+          const currentActiveOriginalIndex = parseInt(slides[currentIndex].dataset.originalIndex || slides[currentIndex].dataset.slideIndex);
+          if (targetOriginalIndex !== currentActiveOriginalIndex) {
+            updateSlider(targetOriginalIndex);
+          }
+      }
   });
 
   prevBtn.addEventListener('click', () => updateSlider('prev'));
   nextBtn.addEventListener('click', () => updateSlider('next'));
 
-  // Initial setup
-  initializeSliderState(); // This sets up clones for desktop if needed
+  initializeSliderState();
 
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      const previouslyMobile = isMobileView;
+      const oldMobileView = isMobileView;
       isMobileView = window.innerWidth <= 767;
-      if (previouslyMobile !== isMobileView) {
-        initializeSliderState(); // Re-initialize if breakpoint is crossed
+      if (oldMobileView !== isMobileView) {
+        initializeSliderState();
       } else if (!isMobileView) {
         positionTrackForActiveSlide(true);
       }
     }, 250);
   });
 
-  console.log('Advanced slider (Mobile Adjust V1) initialized.');
+  console.log('Advanced slider (Refined Reset Logic) initialized.');
 });
