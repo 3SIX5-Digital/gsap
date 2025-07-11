@@ -1,0 +1,17 @@
+/* GSAP Tooltip Styles */
+.gsap-tooltip {
+  position: absolute; /* Crucial for positioning next to the trigger */
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.4;
+  z-index: 9999; /* Ensure it's on top of other elements */
+  opacity: 0; /* Start fully transparent for GSAP animation */
+  visibility: hidden; /* Start hidden for GSAP animation & accessibility */
+  pointer-events: none; /* Tooltip itself should not be interactive */
+  white-space: nowrap; /* Prevent text wrapping by default, adjust if needed */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  /* Add any other default styles you want */
+}
