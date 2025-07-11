@@ -1,17 +1,47 @@
-/* GSAP Tooltip Styles */
+/* GSAP Tooltip Styles - Dark Theme Frosty Glass */
 .gsap-tooltip {
-  position: absolute; /* Crucial for positioning next to the trigger */
-  background-color: #333;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  position: absolute;
+  /* Frosty Glass Effect */
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white for light on dark */
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%); /* For Safari */
+
+  color: #f0f0f0; /* Light text color for dark backgrounds */
+  padding: 10px 15px; /* Slightly more padding */
+  border-radius: 8px; /* Softer radius */
   font-size: 14px;
   line-height: 1.4;
-  z-index: 9999; /* Ensure it's on top of other elements */
-  opacity: 0; /* Start fully transparent for GSAP animation */
-  visibility: hidden; /* Start hidden for GSAP animation & accessibility */
-  pointer-events: none; /* Tooltip itself should not be interactive */
-  white-space: nowrap; /* Prevent text wrapping by default, adjust if needed */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  /* Add any other default styles you want */
+  z-index: 9999;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+
+  border: 1px solid rgba(255, 255, 255, 0.18); /* Subtle border for definition */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Softer, slightly larger shadow */
+
+  /* For 3D effect - will be used by JavaScript */
+  transform-style: preserve-3d;
+  perspective: 1000px; /* Apply perspective directly on the tooltip for simplicity */
+
+  /* Subtle transition for properties GSAP might not initially control on show/hide if changed directly */
+  transition: background-color 0.3s, border-color 0.3s;
+
+  overflow: hidden; /* Needed to contain the sheen pseudo-element */
+}
+
+.gsap-tooltip::after {
+  content: '';
+  position: absolute;
+  top: -50%; /* Start off-card */
+  left: -50%;
+  width: 200%; /* Make it larger than the card to allow movement */
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 50%);
+  opacity: 0;
+  transform: translate(-50%, -50%); /* Center it initially if needed, but we'll control with GSAP */
+  transition: opacity 0.3s ease-in-out; /* For fade in/out of sheen */
+  pointer-events: none; /* Ensure it doesn't block anything */
+  z-index: 0; /* Behind content, but above background */
 }
