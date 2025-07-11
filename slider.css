@@ -1,0 +1,95 @@
+/* Basic styling for the slider container */
+.slider-container {
+  position: relative; /* Needed for absolute positioning of nav buttons */
+  width: 90%; /* Adjust as needed, or use max-width */
+  max-width: 1000px; /* Example max width */
+  margin: 20px auto; /* Center the slider */
+  overflow: hidden; /* Crucial for the sliding effect */
+  border: 1px solid #ccc; /* Optional: for visual clarity */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: nice shadow effect */
+}
+
+/* Wrapper for all slides */
+.slides-wrapper {
+  display: flex; /* Arranges slides in a row */
+  transition: transform 0.5s ease-in-out; /* Smooth sliding animation */
+  /* Width will be set by JavaScript based on number of slides */
+}
+
+/* Individual slide styling */
+.slide {
+  min-width: 100%; /* Each slide takes full width of the container */
+  box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+  /* Add any specific styling for your slides here */
+  text-align: center; /* Example: center content */
+  padding: 20px 0; /* Example: add some padding */
+}
+
+.slide img {
+  max-width: 100%;
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Remove extra space below image */
+  margin: 0 auto; /* Center image if it's smaller than slide */
+}
+
+.slide-caption {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Styling for navigation buttons */
+.prev-btn,
+.next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  z-index: 100; /* Ensure buttons are above slides */
+  font-size: 1.5em;
+  border-radius: 5px; /* Optional: rounded corners */
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
+}
+
+.prev-btn:hover,
+.next-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Basic responsiveness */
+@media (max-width: 768px) {
+  .slider-container {
+    width: 95%;
+  }
+
+  .prev-btn,
+  .next-btn {
+    padding: 8px 12px;
+    font-size: 1.2em;
+  }
+
+  .slide-caption {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .prev-btn,
+  .next-btn {
+    padding: 6px 10px;
+    font-size: 1em;
+  }
+  /* Hide captions on very small screens if needed */
+  /* .slide-caption { display: none; } */
+}
