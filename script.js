@@ -10,30 +10,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function drawGrid() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.lineWidth = 1;
+
+        for (let x = 0; x < canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+
+        for (let y = 0; y < canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
     }
 
     function handleMouseMove(e) {
         const mouseX = e.clientX;
         const mouseY = e.clientY;
 
-        drawGrid();
-
         const nearX = Math.round(mouseX / gridSize) * gridSize;
         const nearY = Math.round(mouseY / gridSize) * gridSize;
 
-        const gradientX = ctx.createRadialGradient(nearX, mouseY, 0, nearX, mouseY, gridSize * 3);
-        gradientX.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-        gradientX.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        drawGrid();
 
-        const gradientY = ctx.createRadialGradient(mouseX, nearY, 0, mouseX, nearY, gridSize * 3);
-        gradientY.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-        gradientY.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, gridSize * 2);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-        ctx.fillStyle = gradientX;
-        ctx.fillRect(nearX - gridSize * 3, mouseY - gridSize * 3, gridSize * 6, gridSize * 6);
-
-        ctx.fillStyle = gradientY;
-        ctx.fillRect(mouseX - gridSize * 3, nearY - gridSize * 3, gridSize * 6, gridSize * 6);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(mouseX - gridSize * 2, mouseY - gridSize * 2, gridSize * 4, gridSize * 4);
     }
 
     window.addEventListener('resize', () => {
@@ -48,24 +57,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
     gsap.registerPlugin(Draggable);
 
-    Draggable.create(".draggable-element", {
-        type: "x,y",
-        edgeResistance: 0.65,
-        bounds: "body",
-        inertia: true,
-        onDragStart: function() {
-            gsap.to(this.target, {
-                scale: 1.1,
-                boxShadow: '0px 0px 30px 10px rgba(0,0,0,0.2)'
-            });
-        },
-        onDragEnd: function() {
-            gsap.to(this.target, {
-                scale: 1,
-                boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)'
-            });
-        }
-    });
+    // Initialize Draggable after a short delay to ensure elements are positioned
+    setTimeout(() => {
+        Draggable.create(".draggable-element", {
+            type: "x,y",
+            edgeResistance: 0.65,
+            bounds: "body",
+            inertia: true,
+            onDragStart: function() {
+                gsap.to(this.target, {
+                    scale: 1.1,
+                    boxShadow: '0px 0px 30px 10px rgba(0,0,0,0.2)'
+                });
+            },
+            onDragEnd: function() {
+                gsap.to(this.target, {
+                    scale: 1,
+                    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)'
+                });
+            }
+        });
+    }, 100);
+
 
     const creativeText = document.createElement('div');
     creativeText.className = 'creative-text';
