@@ -1,7 +1,7 @@
 body {
     margin: 0;
     overflow: hidden;
-    background-color: #111;
+    background-color: #f5f5f5;
 }
 
 #grid-canvas {
@@ -15,27 +15,50 @@ body {
 
 .draggable-element {
     position: absolute;
-    width: 100px;
-    height: 100px;
-    background-color: #ff00ff;
-    border-radius: 10px;
+    width: 120px;
+    height: 120px;
+    background-color: #ff6b6b;
+    border-radius: 20px;
     cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 18px;
+    color: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.draggable-element:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 #element1 {
-    top: 100px;
-    left: 100px;
-    background-color: #00ff00;
+    top: 150px;
+    left: 200px;
+    background-color: #4ecdc4;
 }
 
 #element2 {
-    top: 250px;
-    left: 250px;
-    background-color: #0000ff;
+    top: 350px;
+    left: 450px;
+    background-color: #45b7d1;
 }
 
 #element3 {
-    top: 400px;
-    left: 400px;
-    background-color: #ffff00;
+    top: 550px;
+    left: 700px;
+    background-color: #f7b733;
+}
+
+.creative-text {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    color: #333;
+    opacity: 0.8;
 }

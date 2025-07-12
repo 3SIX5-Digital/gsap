@@ -9,45 +9,30 @@ function resizeCanvas() {
 
 function drawGrid() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.lineWidth = 1;
-
-    for (let x = 0; x < canvas.width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-
-    for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
 }
 
 function handleMouseMove(e) {
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
+    drawGrid();
+
     const nearX = Math.round(mouseX / gridSize) * gridSize;
     const nearY = Math.round(mouseY / gridSize) * gridSize;
 
-    drawGrid();
+    const gradientX = ctx.createRadialGradient(nearX, mouseY, 0, nearX, mouseY, gridSize * 3);
+    gradientX.addColorStop(0, 'rgba(0, 0, 0, 0.2)');
+    gradientX.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-    ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
-    ctx.lineWidth = 2;
+    const gradientY = ctx.createRadialGradient(mouseX, nearY, 0, mouseX, nearY, gridSize * 3);
+    gradientY.addColorStop(0, 'rgba(0, 0, 0, 0.2)');
+    gradientY.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
-    ctx.beginPath();
-    ctx.moveTo(nearX, 0);
-    ctx.lineTo(nearX, canvas.height);
-    ctx.stroke();
+    ctx.fillStyle = gradientX;
+    ctx.fillRect(nearX - gridSize * 3, mouseY - gridSize * 3, gridSize * 6, gridSize * 6);
 
-    ctx.beginPath();
-    ctx.moveTo(0, nearY);
-    ctx.lineTo(canvas.width, nearY);
-    ctx.stroke();
+    ctx.fillStyle = gradientY;
+    ctx.fillRect(mouseX - gridSize * 3, nearY - gridSize * 3, gridSize * 6, gridSize * 6);
 }
 
 window.addEventListener('resize', () => {
@@ -70,15 +55,18 @@ Draggable.create(".draggable-element", {
     onDragStart: function() {
         gsap.to(this.target, {
             scale: 1.1,
-            backgroundColor: '#ff4500',
-            boxShadow: '0px 0px 20px 5px #ff4500'
+            boxShadow: '0px 0px 30px 10px rgba(0,0,0,0.2)'
         });
     },
     onDragEnd: function() {
         gsap.to(this.target, {
             scale: 1,
-            backgroundColor: this.target.style.backgroundColor,
-            boxShadow: 'none'
+            boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)'
         });
     }
 });
+
+const creativeText = document.createElement('div');
+creativeText.className = 'creative-text';
+creativeText.textContent = 'A space for ideas to grow.';
+document.body.appendChild(creativeText);
