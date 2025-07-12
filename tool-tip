@@ -1,27 +1,30 @@
+<style>
+body {
+  background-color: white;
+}
+
+.dot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #ff0000;
+  border-radius: 50%;
+  pointer-events: none;
+}
+</style>
 <script>
-gsap.utils.toArray(".wf-element").forEach(el => {
-  let tooltip = el.getAttribute("data-tooltip");
+const dot = document.createElement("div");
+dot.className = "dot";
+document.body.appendChild(dot);
 
-  ScrollTrigger.create({
-    trigger: el,
-    start: "top 80%",
-    onEnter: () => showTooltip(el, tooltip),
-    onLeaveBack: () => hideTooltip()
+gsap.set(dot, {xPercent: -50, yPercent: -50});
+
+window.addEventListener("mousemove", e => {
+  gsap.to(dot, {
+    duration: 0.5,
+    x: e.clientX,
+    y: e.clientY,
+    ease: "power2.out"
   });
-
-  el.addEventListener("mouseenter", () => showTooltip(el, tooltip));
-  el.addEventListener("mouseleave", hideTooltip);
 });
-
-function showTooltip(el, text) {
-  const tooltip = document.querySelector(".tooltip");
-  tooltip.innerText = text;
-  tooltip.style.display = "block";
-  gsap.to(tooltip, { opacity: 1, x: el.offsetLeft + 40, y: el.offsetTop });
-}
-function hideTooltip() {
-  gsap.to(".tooltip", { opacity: 0, onComplete: () => {
-    document.querySelector(".tooltip").style.display = "none";
-  }});
-}
 </script>
