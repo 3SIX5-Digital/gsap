@@ -41,3 +41,39 @@ header {
     font-size: 1.5rem;
     opacity: 0;
 }
+
+.close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+}
+
+.marquee {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 0.5rem 0;
+    overflow: hidden;
+}
+
+.marquee-content {
+    display: flex;
+    animation: marquee 10s linear infinite;
+}
+
+.marquee-content span {
+    white-space: nowrap;
+    padding: 0 2rem;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

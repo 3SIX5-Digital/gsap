@@ -48,6 +48,42 @@
             font-size: 1.5rem;
             opacity: 0;
         }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+
+        .marquee {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 10s linear infinite;
+        }
+
+        .marquee-content span {
+            white-space: nowrap;
+            padding: 0 2rem;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
     </style>
 </head>
 <body>
@@ -57,6 +93,9 @@
         </div>
     </header>
     <nav class="mobile-nav">
+        <div class="close-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"/></svg>
+        </div>
         <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#">About</a></li>
@@ -64,9 +103,18 @@
             <li><a href="#">Contact</a></li>
         </ul>
     </nav>
+    <div class="marquee">
+        <div class="marquee-content">
+            <span>Get 20% off our Webflow agency support!</span>
+            <span>Get 20% off our Webflow agency support!</span>
+            <span>Get 20% off our Webflow agency support!</span>
+            <span>Get 20% off our Webflow agency support!</span>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
     <script>
         const menuButton = document.querySelector('.menu-button');
+        const closeButton = document.querySelector('.close-button');
         const mobileNav = document.querySelector('.mobile-nav');
         const navLinks = gsap.utils.toArray('.mobile-nav a');
 
@@ -88,7 +136,11 @@
         }, "-=0.2");
 
         menuButton.addEventListener('click', () => {
-            tl.reversed() ? tl.play() : tl.reverse();
+            tl.play();
+        });
+
+        closeButton.addEventListener('click', () => {
+            tl.reverse();
         });
     </script>
 </body>

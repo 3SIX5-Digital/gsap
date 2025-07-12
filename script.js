@@ -1,4 +1,5 @@
 const menuButton = document.querySelector('.menu-button');
+const closeButton = document.querySelector('.close-button');
 const mobileNav = document.querySelector('.mobile-nav');
 const navLinks = gsap.utils.toArray('.mobile-nav a');
 
@@ -20,5 +21,9 @@ tl.to(navLinks, {
 }, "-=0.2");
 
 menuButton.addEventListener('click', () => {
-    tl.reversed() ? tl.play() : tl.reverse();
+    tl.play();
+});
+
+closeButton.addEventListener('click', () => {
+    tl.reverse();
 });
