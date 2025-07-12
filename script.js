@@ -36,7 +36,7 @@ function handleMouseMove(e) {
 
     drawGrid();
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
     ctx.lineWidth = 2;
 
     ctx.beginPath();
@@ -68,9 +68,17 @@ Draggable.create(".draggable-element", {
     bounds: "body",
     inertia: true,
     onDragStart: function() {
-        gsap.to(this.target, { scale: 1.1, backgroundColor: '#ff4500' });
+        gsap.to(this.target, {
+            scale: 1.1,
+            backgroundColor: '#ff4500',
+            boxShadow: '0px 0px 20px 5px #ff4500'
+        });
     },
     onDragEnd: function() {
-        gsap.to(this.target, { scale: 1, backgroundColor: this.target.style.backgroundColor });
+        gsap.to(this.target, {
+            scale: 1,
+            backgroundColor: this.target.style.backgroundColor,
+            boxShadow: 'none'
+        });
     }
 });
