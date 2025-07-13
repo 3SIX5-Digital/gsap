@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spinning Wheel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,10 +27,31 @@
             <div class="grid-item"></div>
             <div class="grid-item"></div>
         </div>
-        <div class="wheel-container">
-            <div class="wheel"></div>
+        <div id="wrapper">
+          <div id="wheel">
+            <div id="inner-wheel">
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+              <div class="sec"></div>
+            </div>
+            <div id="spin">
+              <div id="inner-spin"></div>
+            </div>
+            <div id="shine"></div>
+          </div>
+          <div id="txt"></div>
         </div>
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
     <script src="script.js"></script>
 </body>
