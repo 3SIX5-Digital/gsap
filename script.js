@@ -2,53 +2,37 @@ const wrapper = document.querySelector('.organ-cell-wrapper');
 const text = document.querySelector('.what-we-detect');
 const image = document.querySelector('.organ-image');
 
+const tl = gsap.timeline({ paused: true });
+
+tl.to(text.children, {
+    opacity: 1,
+    filter: 'blur(0px)',
+    stagger: {
+        each: 0.05,
+        from: 'start'
+    },
+    duration: 0.2,
+    ease: 'power1.inOut'
+})
+.to(image, {
+    scale: 1.05,
+    duration: 1,
+    ease: 'power2.out'
+}, 0)
+.to('.ripple', {
+    width: '200px',
+    height: '200px',
+    duration: 1,
+    ease: 'power2.out'
+}, 0);
+
 wrapper.addEventListener('mouseenter', () => {
-    gsap.to(text.children, {
-        opacity: 1,
-        y: 0,
-        stagger: {
-            each: 0.1,
-            from: 'start'
-        },
-        duration: 0.4,
-        ease: 'power1.inOut'
-    });
-
-    gsap.to(image, {
-        scale: 1.05,
-        duration: 1,
-        ease: 'power2.out'
-    });
-
-    gsap.to('.ripple', {
-        width: '200px',
-        height: '200px',
-        duration: 1,
-        ease: 'power2.out'
-    });
+    tl.timeScale(1).play();
 });
 
 wrapper.addEventListener('mouseleave', () => {
-    gsap.to(text.children, {
-        opacity: 0,
-        y: 20,
-        duration: 0.4,
-        ease: 'power1.inOut'
-    });
-
-    gsap.to(image, {
-        scale: 1,
-        duration: 1,
-        ease: 'power2.out'
-    });
-
-    gsap.to('.ripple', {
-        width: '0px',
-        height: '0px',
-        duration: 1,
-        ease: 'power2.out'
-    });
+    tl.timeScale(2).reverse();
 });
 
 // Initial state
-gsap.set(text.children, { opacity: 0, y: 20 });
+gsap.set(text.children, { opacity: 0, filter: 'blur(20px)' });
