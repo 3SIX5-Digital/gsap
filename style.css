@@ -1,0 +1,47 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    margin: 0;
+}
+
+.organ-cell-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.what-we-detect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    font-family: sans-serif;
+}
+
+.what-we-detect span {
+    display: inline-block;
+}
+
+.organ-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
