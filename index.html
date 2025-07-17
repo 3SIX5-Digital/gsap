@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.organ-cell-wrapper {
+  border: 1px solid black;
+  padding: 10px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.detection-section-back {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.modal-close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.modal-close-button:hover,
+.modal-close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="organ-cell-wrapper" data-filter="brain">Brain</div>
+<div class="organ-cell-wrapper" data-filter="lungs">Lungs</div>
+<div class="organ-cell-wrapper" data-filter="heart">Heart</div>
+
+<div class="detection-section-back">
+  <div class="modal-content">
+    <span class="modal-close-button">&times;</span>
+    <input type="text" id="search-input" placeholder="Search...">
+    <div class="filter-item" data-category="brain">
+      <h2>Brain</h2>
+      <p>The brain is an organ that serves as the center of the nervous system in all vertebrate and most invertebrate animals.</p>
+    </div>
+    <div class="filter-item" data-category="lungs">
+      <h2>Lungs</h2>
+      <p>The lungs are the primary organs of the respiratory system in humans and many other animals including a few fish and some snails.</p>
+    </div>
+    <div class="filter-item" data-category="heart">
+      <h2>Heart</h2>
+      <p>The heart is a muscular organ in most animals, which pumps blood through the blood vessels of the circulatory system.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Wait for the DOM to be fully loaded
+document.addEventListener("DOMContentLoaded", function() {
+
+  // Get all the organ cells
+  const organCells = document.querySelectorAll('.organ-cell-wrapper');
+
+  // Get the modal and the filterable content
+  const modal = document.querySelector('.detection-section-back');
+  const filterItems = document.querySelectorAll('.filter-item');
+
+  // Get the search input
+  const searchInput = document.getElementById('search-input');
+
+  // Add a click event listener to each organ cell
+  organCells.forEach(cell => {
+    cell.addEventListener('click', function() {
+      // Get the filter value from the custom attribute
+      const filterValue = this.getAttribute('data-filter');
+
+      // Open the modal
+      modal.style.display = 'block';
+
+      // Filter the content
+      filterContent(filterValue);
+    });
+  });
+
+  // Function to filter the content
+  function filterContent(filter) {
+    filterItems.forEach(item => {
+      if (filter === 'all' || item.getAttribute('data-category') === filter) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  // Add an event listener to the search input
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+      const searchValue = this.value.toLowerCase();
+      const activeFilter = modal.querySelector('.filter-item[style*="display: block"]').getAttribute('data-category');
+
+      filterItems.forEach(item => {
+        if (item.getAttribute('data-category') === activeFilter) {
+          const itemText = item.textContent.toLowerCase();
+          if (itemText.includes(searchValue)) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+      });
+    });
+  }
+
+  // Add a click event listener to the close button of the modal
+  const closeButton = document.querySelector('.modal-close-button');
+  if (closeButton) {
+    closeButton.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+  }
+});
+</script>
+
+</body>
+</html>
