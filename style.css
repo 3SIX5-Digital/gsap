@@ -1,0 +1,205 @@
+body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.app-container {
+    width: 80%;
+    max-width: 900px;
+    text-align: center;
+}
+
+.toggle-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle-label {
+    margin-left: 10px;
+}
+
+/* Basic Grid Styles */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.grid-item {
+    background-color: #4a90e2;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 24px;
+}
+
+.grid-item:hover {
+    background-color: #357abd;
+}
+
+.grid-container.wheel-view {
+    display: block;
+    position: relative;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    margin: 40px auto;
+    transform: rotate(0deg); /* for spinning */
+    padding: 0;
+    box-shadow: none;
+    border: 5px solid #4a90e2;
+}
+
+.grid-container.wheel-view .grid-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    margin: -40px;
+    --angle: calc(var(--i) * var(--angle-step) - 90deg); /* Start from top */
+    transform: rotate(var(--angle)) translate(175px) rotate(calc(-1 * var(--angle)));
+}
+
+#spin-button {
+    display: none; /* Hidden by default */
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#spin-button:hover {
+    background-color: #218838;
+}
+
+#spin-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.wheel-view ~ #spin-button { /* Use ~ general sibling combinator */
+    display: inline-block; /* Show it when wheel view is active */
+}
+
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+}
+
+#respin-button {
+    padding: 10px 20px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+#respin-button:hover {
+    background-color: #357abd;
+}
+
+/* Toggle Switch Styles */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
