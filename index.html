@@ -1,0 +1,62 @@
+<!--
+  GSAP Gyro Marble – tilt your phone to roll a ball around a grid.
+  - Phone: uses DeviceMotion/DeviceOrientation (with iOS permission prompt).
+  - Desktop: drag to "tilt" or use arrow/WASD.
+  - Features: friction, sensitivity, calibration, walls, coins, timer, bounce.
+  - Single-file. Paste into CodePen's HTML panel.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>GSAP Gyro Marble</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="wrap">
+      <div class="board" id="board">
+        <div class="grid" id="grid" aria-label="Gyro Marble Grid"></div>
+        <!-- Overlays -->
+        <div class="walls" id="walls"></div>
+        <div class="coins" id="coins"></div>
+        <!-- Marble -->
+        <div class="marble" id="marble"><div class="ball"></div></div>
+        <!-- Overlays -->
+        <div class="endzone" id="endzone"></div>
+        <div class="gate" id="gate">
+          <div class="inner">
+            <div class="gate_title"></div>
+            <div class="gate_text"></div>
+            <button class="btn" id="playBtn"></button>
+          </div>
+        </div>
+        <!-- Motion permission (iOS secure contexts) -->
+        <div class="motion-gate" id="motionGate" hidden>
+          <div class="inner">
+            <div style="opacity:.85">Enable motion sensors to tilt the board</div>
+            <button class="btn" id="enableMotion">Enable Motion</button>
+            <div style="opacity:.7">You can also drag or use arrow keys</div>
+          </div>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="controls">
+          <button class="btn" id="reset">Reset</button>
+          <button class="btn" id="calibrate">Calibrate</button>
+          <div class="field">Sensitivity <input id="sens" type="range" min="0.5" max="3" step="0.1" value="1.4"><span id="sensVal">1.4×</span></div>
+          <div class="field">Friction <input id="fric" type="range" min="0.85" max="0.99" step="0.01" value="0.94"><span id="fricVal">0.94</span></div>
+        </div>
+        <div class="statbar">
+          <span class="badge">Coins: <b id="coinCount">0</b>/8</span>
+          <span class="badge">Time: <b id="time">0.0s</b></span>
+          <span class="badge" style="opacity:.8">Controls: tilt • drag • WASD/←↑→↓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="script.js"></script>
+</body>
+</html>
